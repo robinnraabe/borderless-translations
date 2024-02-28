@@ -8,7 +8,6 @@ function* getProject(action) {
             headers: { 'Content-Type': 'application/json' },
             withCredentials: true,
         };
-
         // TODO: Set to correct URL and request type
         const response = yield axios.get(`/api/project/contractor/${action.payload}`, config);
 

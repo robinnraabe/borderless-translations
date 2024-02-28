@@ -22,9 +22,9 @@ CREATE TABLE "projects" (
 	"duration" TEXT,
 	"created_at" DATE DEFAULT CURRENT_TIMESTAMP, 
 	"due_at" DATE NOT NULL,
-	"status" VARCHAR DEFAULT 'NOT STARTED',
-	"translator_status" TEXT DEFAULT 'NOT STARTED',
-	"proofreader_status" TEXT DEFAULT 'NOT STARTED',
+	"status" VARCHAR DEFAULT 'Not Started',
+	"translator_status" TEXT DEFAULT 'Not Started',
+	"proofreader_status" TEXT DEFAULT 'Not Started',
 	CONSTRAINT "projects_pk" PRIMARY KEY ("id")
 );
 
@@ -125,7 +125,7 @@ INSERT INTO "languages" ("name", "tier")
 VALUES ('Italian', '1'),('Spanish', '1'),('Portuguese', '1'),('Romanian', '1'),('Croatian', '1'),('Serbian', '1'),
 ('Czech', '1'),('Slovak', '1'),('Polish', '1'),('Bulgarian', '1'),('Hungarian', '1'),
 ('French', '2'),('English', '2'),('Ukranian', '2'),('Turkish', '2'),('Greek', '2'),('Vietnamese', '2'),('Khmer', '2'),
-('Simplified Chinese', '3'),('German', '3'),('Duth', '3'),('Arabic', '3'),('Hebrew', '3'),
+('Simplified Chinese', '3'),('German', '3'),('Dutch', '3'),('Arabic', '3'),('Hebrew', '3'),
 ('Japanese', '4'),('Korean', '4'),('Finnish', '4'),('Danish', '4'),('Swedish', '4'),('Norwegian', '4');
 
 INSERT INTO "services" ("type")
@@ -149,7 +149,7 @@ VALUES ('Stinger Attachments', 'Dustin Smith', 'USA', 'CST', 'Minneapolis, MN', 
 INSERT INTO "expertise" ("type")
 VALUES ('Medical'), ('Legal'), ('Academic'), ('Certified Translator'), ('Tech'), ('Finance');
 
-INSERT INTO "contractor_profile" ("user_id", "contractor_name", "phone", "available", "timezone", "location", "linkedIn", "base_written_rate", "base_audio_video_rate")
+INSERT INTO "contractor_profile" ("user_id", "contractor_name", "phone", "available", "timezone", "location", "linked_in", "base_written_rate", "base_audio_video_rate")
 VALUES (7, 'translator 1', '1-222-333-4444', FALSE, '-6:00 UTC', 'Minneapolis, MN, USA', 'linkedInName', 0.25, 8),
 (2, 'translator 2', '1-222-333-4444', TRUE, '-6:00 UTC', 'Minneapolis, MN, USA', 'linkedInName', 0.25, 8);
 
@@ -160,9 +160,9 @@ INSERT INTO "contractor_language" ("user_id", "from_language_id", "to_language_i
 VALUES (7,	1,	2), (7,	3,	4), (7,	2,	1), (7,	4,	3), (2,	1,	2), (2,	3,	4), (2,	2,	1), (2,	4,	3);
 
 INSERT INTO "projects" ("admin_id", "client_id", "description", "duration", "created_at", "due_at", "translator_status", "proofreader_status")
-VALUES (1, 1, 'short description', '9 min', '2024-02-20', '2024-02-21', 'Not started',	'Not started'),
+VALUES (1, 1, 'short description', '9 min', '2024-02-20', '2024-02-21', 'Not Started',	'Not Started'),
 (1, 1, 'long description long description long description long description', '30000 words', '2024-02-20', '2024-02-21', 'Complete', 'Complete'),
-(1, 1, 'short description', '5 min', '2024-02-12', '2024-02-16', 'Complete', 'Not started'),
+(1, 1, 'short description', '5 min', '2024-02-12', '2024-02-16', 'Complete', 'Not Started'),
 (1, 1, 'long description long description long description long description', '50000 words', '2024-02-10', '2024-02-15', 'Complete', 'Complete');
 
 INSERT INTO "project_language" ("project_id", "contractor_id", "proofreader_id", "from_language_id", "to_language_id", "text_to_translate", "translator_notes", "service_id", "flagged")
@@ -171,5 +171,5 @@ VALUES (1, 7, 2, 3, 4, 'this is the text to translate', 'current notes', 5, TRUE
 (1, 7, 2, 3, 4, 'this is the text  to translate', 'current notes', 5, FALSE),
 (2, 2, 7, 5, 6, 'this is the text to translate', '', 3, TRUE);
 
-INSERT INTO "contractor_expertise" ("expertise_id", "contractor_id")
+INSERT INTO "contractor_expertise" ("expertise_id", "user_id")
 VALUES (2, 2), (7, 3);

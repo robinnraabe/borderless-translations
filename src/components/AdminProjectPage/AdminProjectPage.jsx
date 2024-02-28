@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
-import { Card, CardContent, Typography, Paper, Grid, Button, TableContainer, Table, TableBody, TableHead, TableRow, TableCell } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { TableContainer, Paper, Table, TableBody, TableCell, TableHead, TableRow, Button, IconButton, Tooltip } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -16,7 +16,15 @@ function AdminProjectPage() {
     const history = useHistory();
 
     const projects = useSelector(store => store.allProjects);
-    const clients = useSelector(store => store.allClients)
+    const clients = useSelector(store => store.allClients);
+
+    const toProject = (id) => {
+        const action = { type: 'GET_ALL_PROJECTS', payload: id };
+        dispatch(action);
+        setTimeout(() => {
+            history.push(`/project/details/${id}`);
+        }, 500);
+    }
    
     const [modalOpen, setModalOpen] = useState(false);
     useEffect(() => {
@@ -39,40 +47,56 @@ function AdminProjectPage() {
         '&:nth-of-type(even)': { backgroundColor: "#e3fbfb" }
     }
 
+    const buttonStyle = {
+        backgroundColor: '#48a6cd',
+        color: 'white',
+        "&:hover": {
+            backgroundColor: '#332c7b'
+        },
+        marginBottom: '10px'
+    }
+
     return (
         <>
-            <div>
+            <div className='container'>
                 <h2>Admin Project Main</h2>
-                <button className='btn btn_sizeSm' onClick={() => handleAddProject()}>Add Project</button>
+                <Button className='btn btn_sizeSm' disableRipple  variant='contained' sx={buttonStyle} 
+                    onClick={() => handleAddProject()}>Add Project</Button>
                 <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                        <TableHead sx={{"& th": {color: "white", fontWeight: 700, backgroundColor: "#332c7b"}}}>
+                    <Table sx={{ minWidth: 650, border: '2px solid #332c7b' }} aria-label="simple table">
+                        <TableHead sx={{"& th": {color: "white", fontWeight: 700, backgroundColor: "#332c7b", border: '1px solid #332c7b'}}}>
                             <TableRow>
                                 <TableCell align="center">Name</TableCell>
                                 <TableCell align="center">Description</TableCell>
-                                <TableCell align="center">Due By</TableCell>
-                                <TableCell align="center">Status</TableCell>
+                                <TableCell align="center">Due Date</TableCell>
                                 <TableCell align="center">Translator Status</TableCell>
                                 <TableCell align="center">Proofreader Status</TableCell>
                                 <TableCell align="center">Project Scope</TableCell>
-                                <TableCell align="center">Edit</TableCell>
+                                <TableCell align="center">View</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {projects.map(project => (
-                                <TableRow key={project.project_id}  sx={tableRowStyle}>
-                                    <TableCell component="th" scope="row">
-                                        <Link to={`/project/details/${project.project_id}`}>{project.client_name}</Link>
-                                    </TableCell>
-                                    <TableCell align="center">{project.project_description}</TableCell>
+                                <TableRow key={project.project_id}  sx={tableRowStyle}
+                                style={{backgroundColor: project.flagged ? 'pink' : ''}}>
+                                    <TableCell component="th" scope="row" align="center">{project.client_name}</TableCell>
+                                    <TableCell align="left">{project.project_description}</TableCell>
                                     <TableCell align="center">{DateTime.fromISO(project.due_at).toFormat('DDD')}</TableCell>
-                                    <TableCell align="center">{project.project_status}</TableCell>
-                                    <TableCell align="center">{project.translator_status}</TableCell>
-                                    <TableCell align="center">{project.proofreader_status}</TableCell>
+                                    <TableCell align="center">{project.translator_name}<br/>{project.translator_status}</TableCell>
+                                    <TableCell align="center">{project.proofreader_name}<br/>{project.proofreader_status}</TableCell>
                                     <TableCell align="center">{project.duration}</TableCell>
                                     <TableCell align="center">
-                                        <button className='btn btn_sizeSm' onClick={() => handleEditProject(project)}>Edit Project</button>
-                                    </TableCell>
+                                    <IconButton onClick={() => toProject(project.project_id)}
+                                        disableElevation
+                                        disableRipple
+                                        size="small"
+                                        sx={buttonStyle}
+                                        >
+                                        <Tooltip title="View project details">
+                                            <VisibilityIcon />
+                                        </Tooltip>
+                                    </IconButton>
+                                </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

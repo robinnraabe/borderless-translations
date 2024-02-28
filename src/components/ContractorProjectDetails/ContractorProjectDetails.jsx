@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
+import { DateTime } from 'luxon';
+import Swal from 'sweetalert2';
 import "./ContractorProjectDetails.css";
 import { Box, Stack, IconButton, Tooltip, TextField, Button, Checkbox }  from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
-import { DateTime } from 'luxon';
 import WestIcon from '@mui/icons-material/West';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-
 
 function ContractorProjectDetails() {
     const dispatch = useDispatch();
@@ -30,39 +30,50 @@ function ContractorProjectDetails() {
     // Updates the project's notes on the DOM and in the database
     const updateNotes = (text) => {
         setNotes(text);
-        dispatch({ type: 'ADD_PROJECT_NOTE', payload: [text, params.id]})
+        dispatch({ type: 'ADD_PROJECT_NOTE', payload: [text, project.id]})
     }
 
     // Updates the project status and the button text
     const handleStatusChange = (status) => {
-        console.log(status);
-        if (user.id === project.translator_id) {
-            // Set translator status to 'in progress'
-            if (status.translator === 'Not started') {
-                project.translator_status = 'In progress';
+        Swal.fire({
+            title: "You are about to change the project status",
+            text: "This action cannot be undone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#48a6cd",
+            cancelButtonColor: "#332c7b",
+            confirmButtonText: "Change Status",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (user.id === project.translator_id) {
+                    // Set translator status to 'in progress'
+                    if (status.translator === 'Not Started') {
+                        project.translator_status = 'In Progress';
+                    }
+                    // Set translator status to 'complete'
+                    else if (status.translator === 'In Progress') {
+                        project.translator_status = 'Complete';
+                        // TODO: This is where to integrate email notifications if we get to it
+                    }
+                    setButtonStatus();
+                    dispatch({ type: 'UPDATE_TRANSLATOR_STATUS', payload: [project.translator_status, params.id] });
+                }
+                else if ((user.id === project.proofreader_id) && (status.translator === 'Complete')) {
+                    // Set proofreader status to 'in progress'
+                    if (status.proofreader === 'Not Started') {
+                        project.proofreader_status = 'In Progress';
+                    }
+                    // Set proofreader status to 'complete'
+                    else if (status.proofreader === 'in Progress') {
+                        project.proofreader_status = 'Complete';
+                        // TODO: This is where to integrate email notifications if we get to it
+                    }
+                    setButtonStatus();
+                    dispatch({ type: 'UPDATE_PROOFREADER_STATUS', payload: [project.proofreader_status, params.id] });
+                }
             }
-            // Set translator status to 'complete'
-            else if (status.translator === 'In progress') {
-                project.translator_status = 'Complete';
-                // TODO: This is where to integrate email notifications if we get to it
-            }
-            setButtonStatus();
-            dispatch({ type: 'UPDATE_TRANSLATOR_STATUS', payload: [project.translator_status, params.id] });
-        }
-        else if ((user.id === project.proofreader_id) && (status.translator === 'complete')) {
-            // Set proofreader status to 'in progress'
-            if (status.proofreader === 'Not started') {
-                project.proofreader_status = 'In progress';
-            }
-            // Set proofreader status to 'complete'
-            else if (status.proofreader === 'in progress') {
-                project.proofreader_status = 'Complete';
-                // TODO: This is where to integrate email notifications if we get to it
-            }
-            setButtonStatus();
-            dispatch({ type: 'UPDATE_PROOFREADER_STATUS', payload: [project.proofreader_status, params.id] });
-        }
-        console.log(buttonStatus);
+        })
     }
 
     // Sets submit button's status
@@ -70,10 +81,10 @@ function ContractorProjectDetails() {
     const setButtonStatus = () => {
         // Sets status for translator
         if (user.id === project.translator_id) {
-            if (project.translator_status === 'Not started') {
+            if (project.translator_status === 'Not Started') {
                 setStatus('Start project'); 
             }
-            else if (project.translator_status === 'In progress') {
+            else if (project.translator_status === 'In Progress') {
                 setStatus('Send to proofreader');
             }
             else if (project.translator_status === 'Complete') {
@@ -83,10 +94,10 @@ function ContractorProjectDetails() {
         // Sets status for proofreader
         else if (user.id === project.proofreader_id) {
             if (project.translator_status === 'Complete') {
-                if (project.proofreader_status === 'Not started') {
+                if (project.proofreader_status === 'Not Started') {
                     setStatus('Send to admin');
                 }
-                else if (project.proofreader_status === 'In progress') {
+                else if (project.proofreader_status === 'In Progress') {
                     setStatus('Complete');
                 }
                 else if (project.proofreader_status === 'Complete') {
@@ -98,8 +109,6 @@ function ContractorProjectDetails() {
                 setStatus('Translation still in progress'); 
             }
         }
-        console.log('user:', user.id, 'translator:', project.translator_id, project.translator_status, 
-        'proofreader:', project.proofreader_id, project.proofreader_status);
     }
 
     const containerStyle = {
@@ -135,20 +144,20 @@ function ContractorProjectDetails() {
     }
 
     const checkStyle = {
-        color: '#332c7b',
+        color: '#48a6cd',
         '&.Mui-checked': {
-            color: '#48a6cd',
+            color: '#332c7b',
         }
-    }
-
-    const toLink = (link) => {
-        window.open(`${link}`);
     }
 
     const viewFile = (projectId) => {
         setTimeout(() => {
             history.push(`/user/project/file/${projectId}`);
         }, 500);
+    }
+
+    const toLink = (link) => {
+        window.open(`${link}`);
     }
 
     const toDashboard = () => {
@@ -176,7 +185,7 @@ function ContractorProjectDetails() {
                 </h2>
                 <Stack direction='row'>
                     <Box sx={containerStyle} className="contractor-details">
-                        <h3>Details</h3>
+                        <h3 style={{textAlign: 'center'}}>Details</h3>
                         <Stack direction='row' sx={{justifyContent: 'space-between', margin: '0px 50px'}}>
                             <Stack direction='column'>
                             <p>Client: {project.client_name}</p>
@@ -230,7 +239,7 @@ function ContractorProjectDetails() {
 
                             </Stack>
                             <Stack direction='column'>
-                            <p>Deadline: {project.due_at}</p>
+                            <p>Deadline: {DateTime.fromISO(project.due_at).toFormat('DDD')}</p>
                             <p>Service type: {project.service_type}</p>
                             <p>Project length: {project.duration}</p>
                             <p>Languages: {project.from_language_name}→{project.to_language_name}</p>
@@ -241,9 +250,8 @@ function ContractorProjectDetails() {
                     </Box>
 
                     <Box sx={containerStyle} className="contractor-settings">
-                        <h3>Settings</h3>
-                        <Stack direction='column'>
-
+                        <h3 style={{textAlign: 'center'}}>Settings</h3>
+                        <Stack direction='column' sx={{ margin: '0px 50px'}}>
                         <Tooltip title="Click icon to change status" placement='top-start'>
                             <p><Checkbox sx={checkStyle} disableRipple 
                                 icon={<RadioButtonUncheckedIcon />} 
@@ -253,15 +261,6 @@ function ContractorProjectDetails() {
                                 {flagged ? <span>Flagged</span> : <span>Not flagged</span>}
                             </p>
                         </Tooltip>
-
-                        <p>Deadline: {DateTime.fromISO(project.due_at).toFormat('DDD')}</p>
-                        <p>Service type: {project.service_type}</p>
-                        <p>Project length: {project.duration}</p>
-                        <p>Languages: {project.from_language_name}→{project.to_language_name}</p>
-                        <p>Translator: {project.translator_name}</p>
-                        <p>Proofreader: {project.proofreader_name}</p>
-                        <p><FlagToggle onClick={updateFlagged()}/> {project.flagged ? <span>Flagged</span> : <span>Not flagged</span>} </p>
-
                             <p>Notes</p>
                             {((buttonStatus === 'Complete') || 
                             (buttonStatus === 'Translation still in progress')) ?

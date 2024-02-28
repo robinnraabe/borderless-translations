@@ -2,7 +2,6 @@ import axios from 'axios';
 import { put, takeLatest } from 'redux-saga/effects';
 
 function* getOngoingProjects() {
-    console.log('in ongoing projects');
     try {
         // the config includes credentials which allow the server session to recognize the user
         const config = {

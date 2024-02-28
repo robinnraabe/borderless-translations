@@ -72,7 +72,12 @@ function App() {
             exact
             path="/user"
           >
+            {user.type === 'admin' ?
               <UserPage /> 
+            :
+              <ContractorDashboard />
+            }
+
           </ProtectedRoute>
 
           <ProtectedRoute
@@ -144,7 +149,7 @@ function App() {
           <ProtectedRoute
             // logged in shows Contractor Profile Settings Page else shows LoginPage
             exact 
-            path="/contractor/profile/:id"
+            path="/contractor/profile"
           >
             <ContractorProfileSettings />
           </ProtectedRoute>

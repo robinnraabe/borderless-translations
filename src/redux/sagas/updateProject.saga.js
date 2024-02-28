@@ -2,6 +2,7 @@ import axios from 'axios';
 import { put, takeLatest } from 'redux-saga/effects';
 
 function* updateProject(action) {
+    console.log('PUT SAGA triggered', action.payload.id)
     try {
         // the config includes credentials which allow the server session to recognize the user
         const config = {
@@ -9,11 +10,11 @@ function* updateProject(action) {
             withCredentials: true,
         };
 
-        yield axios.put('/api/project', action.payload, config); // PUT route updating project
-        const response = axios.get(`/api/project/${action.payload.id}`) // GET updated project
+        yield axios.put(`/api/project/${action.payload[1]}`, action.payload[0], config); // PUT route updating project
+        const response = yield axios.get(`/api/project/contractor/${action.payload[1]}`) // GET updated project
 
         // Store updated project in reducer project
-        yield put({ type: 'SET_PROJECT', payload: response.data });
+        yield put({ type: 'SET_PROJECT', payload: response.data[0] });
     }
     catch (error) {
         console.error('Error in PUT updateProject', error);

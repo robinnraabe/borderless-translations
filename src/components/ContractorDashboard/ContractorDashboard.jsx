@@ -5,13 +5,6 @@ import "./ContractorDashboard.css";
 import { TableContainer, Paper, Table, TableBody, TableCell, TableHead, TableRow, Button, IconButton, Tooltip } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { DateTime } from 'luxon';
-// import * as React from 'react';
-// import Box from '@mui/material/Box';
-// import Card from '@mui/material/Card';
-// import CardActions from '@mui/material/CardActions';
-// import CardContent from '@mui/material/CardContent';
-// import Button from '@mui/material/Button';
-// import Typography from '@mui/material/Typography';
 
 function ContractorDashboard() {
     const dispatch = useDispatch();
@@ -29,22 +22,30 @@ function ContractorDashboard() {
     }
     
     const role = (project) => {
+        console.log(user.id, project.contractor_id, project.proofreader_id);
         if (user.id === project.contractor_id) {
             return 'Translator'
         }
         else if (user.id === project.proofreader_id) {
             return 'Proofreader'
         }
+        else {
+            return 'Admin'
+        }
     }
 
     useEffect(() => {
         dispatch({ type: "GET_ONGOING_PROJECTS" });
         dispatch({ type: "GET_COMPLETED_PROJECTS" });
-      }, [user.id]);
+        dispatch({ type: "GET_CONTRACTOR_SELF" });
+        dispatch({ type: "GET_ALL_LANGUAGES" });
+        dispatch({ type: "GET_ALL_SERVICES" });
+        dispatch({ type: "GET_ALL_EXPERTISE" });
+      }, []);
 
     const headerStyle = {
         backgroundColor: '#332c7b',
-        border: '0px'
+        border: '1px'
     }
 
     const buttonStyle = {
@@ -57,12 +58,13 @@ function ContractorDashboard() {
 
     const headerFontStyle = {
         color: 'white',
-        border: '0px',
-        fontSize: '20px'
+        fontSize: '16px',
+        border: '2px solid #332c7b'
     }
 
     const tableCellStyle = {
-        border: 'none',
+        borderRight: '1px solid black',
+        borderLeft: '1px solid black'
     }
 
     const tableRowStyle = {
@@ -72,8 +74,8 @@ function ContractorDashboard() {
 
     return (
         <div className="container">
-            <h2>Ongoing Projects</h2>
-            <TableContainer component={Paper} sx={{ minWidth: '650px', maxWidth: '80%', border: '2px solid #332c7b' }}>
+            <h2>Current Projects</h2>
+            <TableContainer component={Paper} sx={{ minWidth: '650px', maxWidth: '100%', border: '2px solid #332c7b' }}>
             <Table  aria-label="simple table">
                 <TableHead>
                     <TableRow sx={headerStyle}>
@@ -90,13 +92,14 @@ function ContractorDashboard() {
                         return (
                             <TableRow key={project.id}
                                 sx={tableRowStyle}
+                                style={{backgroundColor: project.flagged ? 'pink' : ''}}
                             >
-                                <TableCell sx={tableCellStyle} align="left">{project.client_name}</TableCell>
+                                <TableCell sx={{border: 'none'}} align="center">{project.client_name}</TableCell>
                                 <TableCell sx={tableCellStyle} align="left">{project.description}</TableCell>
-                                <TableCell sx={tableCellStyle} align="left">{role(project)}</TableCell>
-                                <TableCell sx={tableCellStyle} align="left">{project.translator_status}</TableCell>
-                                <TableCell sx={tableCellStyle} align="left">{DateTime.fromISO(project.due_at).toFormat('DDD')}</TableCell>
-                                <TableCell sx={tableCellStyle} align="center">
+                                <TableCell sx={tableCellStyle} align="center">{role(project)}</TableCell>
+                                <TableCell sx={tableCellStyle} align="center">{project.translator_status}</TableCell>
+                                <TableCell sx={tableCellStyle} align="center">{DateTime.fromISO(project.due_at).toFormat('DDD')}</TableCell>
+                                <TableCell sx={{border: 'none'}} align="center">
                                     <IconButton onClick={() => toProject(project.id)}
                                         disableElevation
                                         disableRipple
@@ -114,8 +117,8 @@ function ContractorDashboard() {
             </Table>
             </TableContainer>
 
-            <h2>Past Projects</h2>
-            <TableContainer component={Paper} sx={{ minWidth: '650px', maxWidth: '80%', border: '2px solid #332c7b'  }}>
+            <h2>Completed Projects</h2>
+            <TableContainer component={Paper} sx={{ minWidth: '650px', maxWidth: '100%', border: '2px solid #332c7b'  }}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                     <TableRow sx={headerStyle}>
@@ -132,13 +135,14 @@ function ContractorDashboard() {
                         return (
                             <TableRow key={project.id}
                                 sx={tableRowStyle}
+                                style={{backgroundColor: project.flagged ? 'pink' : ''}}
                             >
-                                <TableCell sx={tableCellStyle} align="left">{project.client_name}</TableCell>
+                                <TableCell sx={{border: 'none'}} align="center">{project.client_name}</TableCell>
                                 <TableCell sx={tableCellStyle} align="left">{project.description}</TableCell>
-                                <TableCell sx={tableCellStyle} align="left">{role(project)}</TableCell>
-                                <TableCell sx={tableCellStyle} align="left">{project.translator_status}</TableCell>
-                                <TableCell sx={tableCellStyle} align="left">{DateTime.fromISO(project.due_at).toFormat('DDD')}</TableCell>
-                                <TableCell sx={tableCellStyle} align="center">
+                                <TableCell sx={tableCellStyle} align="center">{role(project)}</TableCell>
+                                <TableCell sx={tableCellStyle} align="center">{project.translator_status}</TableCell>
+                                <TableCell sx={tableCellStyle} align="center">{DateTime.fromISO(project.due_at).toFormat('DDD')}</TableCell>
+                                <TableCell sx={{border: 'none'}} align="center">
                                     <IconButton onClick={() => toProject(project.id)}
                                         disableElevation
                                         disableRipple
